@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ArrowDownCircle, ArrowUpCircle, PiggyBank } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { ArrowDownCircle, ArrowUpCircle, LogOut, PiggyBank } from "lucide-react";
 
 const ENLACES = [
   { href: "/ingresos", label: "Ingresos", icon: ArrowUpCircle, accent: "ingreso" },
@@ -18,6 +18,13 @@ const ACENTO_ACTIVO: Record<string, string> = {
 
 export default function NavBar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  };
 
   return (
     <header className="border-b-2 border-ink/80 bg-paper dark:border-ink-dark/60 dark:bg-paper-dark">
@@ -44,6 +51,15 @@ export default function NavBar() {
               </Link>
             );
           })}
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 rounded-t-md border-b-[3px] border-transparent px-4 py-2.5 font-display text-sm font-semibold uppercase tracking-wide text-ink-soft transition-colors hover:text-gasto dark:text-ink-soft-dark dark:hover:text-gasto-dark"
+          >
+            <LogOut className="h-4 w-4" />
+            Salir
+          </button>
         </nav>
       </div>
     </header>
