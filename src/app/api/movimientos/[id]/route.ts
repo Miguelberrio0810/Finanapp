@@ -3,8 +3,9 @@ import { prisma } from "@/lib/prisma";
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  await prisma.movimiento.delete({ where: { id: params.id } }).catch(() => null);
+  const { id } = await params;
+  await prisma.movimiento.delete({ where: { id } }).catch(() => null);
   return NextResponse.json({ ok: true });
 }
