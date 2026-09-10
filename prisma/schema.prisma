@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TipoMovimiento {
+  INGRESO
+  GASTO
+}
+
+model Categoria {
+  id     String         @id @default(cuid())
+  tipo   TipoMovimiento
+  nombre String
+
+  @@unique([tipo, nombre])
+}
+
+model Movimiento {
+  id          String         @id @default(cuid())
+  tipo        TipoMovimiento
+  descripcion String
+  monto       Int
+  etiqueta    String
+  fecha       String
+  creadoEn    DateTime       @default(now())
+
+  @@index([tipo])
+}
+
+model MetaAhorro {
+  id            String   @id @default(cuid())
+  nombreMeta    String
+  montoObjetivo Int
+  montoActual   Int      @default(0)
+  monto15       Int      @default(0)
+  monto30       Int      @default(0)
+  creadoEn      DateTime @default(now())
+}
