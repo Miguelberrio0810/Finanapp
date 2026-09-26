@@ -9,12 +9,14 @@ datasource db {
 enum TipoMovimiento {
   INGRESO
   GASTO
+  AHORRO
 }
 
 model Categoria {
-  id     String         @id @default(cuid())
-  tipo   TipoMovimiento
-  nombre String
+  id          String         @id @default(cuid())
+  tipo        TipoMovimiento
+  nombre      String
+  presupuesto Int            @default(0)
 
   @@unique([tipo, nombre])
 }
@@ -26,17 +28,33 @@ model Movimiento {
   monto       Int
   etiqueta    String
   fecha       String
+  metaId      String?
+  meta        MetaAhorro?    @relation(fields: [metaId], references: [id], onDelete: SetNull)
   creadoEn    DateTime       @default(now())
 
   @@index([tipo])
+  @@index([metaId])
 }
 
 model MetaAhorro {
-  id            String   @id @default(cuid())
+  id            String       @id @default(cuid())
   nombreMeta    String
   montoObjetivo Int
-  montoActual   Int      @default(0)
-  monto15       Int      @default(0)
-  monto30       Int      @default(0)
-  creadoEn      DateTime @default(now())
+  montoActual   Int          @default(0)
+  monto15       Int          @default(0)
+  monto30       Int          @default(0)
+  fase          Int          @default(1)
+  abonos        Movimiento[]
+  creadoEn      DateTime     @default(now())
+}
+
+model Suscripcion {
+  id       String   @id @default(cuid())
+  nombre   String
+  monto    Int
+  diaCobro Int
+  userId   String
+  creadoEn DateTime @default(now())
+
+  @@index([userId])
 }

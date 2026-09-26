@@ -2,78 +2,99 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-paper text-ink antialiased dark:bg-paper-dark dark:text-ink-dark;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent,
-    transparent 27px,
-    theme("colors.rule") 28px
-  );
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   body {
-    background-image: repeating-linear-gradient(
-      to bottom,
-      transparent,
-      transparent 27px,
-      theme("colors.rule-dark") 28px
-    );
+    /* Archivo es la única familia: body y mono apuntan a la misma variable */
+    --font-body: var(--font-display);
+    --font-mono: var(--font-display);
+    @apply bg-paper text-ink antialiased dark:bg-paper-dark dark:text-ink-dark;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display font-extrabold tracking-titular;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    border-radius: 0;
+  }
+
+  /* Cifras alineadas en columna */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid #ec3013;
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: rgb(236 48 19 / 0.3);
   }
 }
 
 @layer components {
-  /* Tarjeta tipo tiquete de compra: canto superior recto, canto inferior rasgado */
+  /* Celda plana de la retícula */
   .ticket {
-    @apply relative bg-card dark:bg-card-dark px-6 pt-6 pb-8;
-    clip-path: polygon(
-      0 0,
-      100% 0,
-      100% calc(100% - 10px),
-      96% 100%,
-      92% calc(100% - 10px),
-      88% 100%,
-      84% calc(100% - 10px),
-      80% 100%,
-      76% calc(100% - 10px),
-      72% 100%,
-      68% calc(100% - 10px),
-      64% 100%,
-      60% calc(100% - 10px),
-      56% 100%,
-      52% calc(100% - 10px),
-      48% 100%,
-      44% calc(100% - 10px),
-      40% 100%,
-      36% calc(100% - 10px),
-      32% 100%,
-      28% calc(100% - 10px),
-      24% 100%,
-      20% calc(100% - 10px),
-      16% 100%,
-      12% calc(100% - 10px),
-      8% 100%,
-      4% calc(100% - 10px),
-      0 100%
-    );
-    filter: drop-shadow(0 3px 4px rgb(32 43 34 / 0.12));
-    transition: transform 0.2s ease;
+    @apply bg-card dark:bg-card-dark p-6;
   }
 
   .ticket-interactive:hover {
-    transform: translateY(-2px) rotate(-0.4deg);
+    @apply bg-neutral-300 dark:bg-neutral-900;
   }
 
-  /* Sello circular tipo estampilla de contabilidad */
+  /* Sello cuadrado */
   .stamp {
-    @apply inline-flex flex-col items-center justify-center rounded-full border-[3px] text-center;
-    mix-blend-mode: multiply;
+    @apply inline-flex flex-col items-center justify-center border-2 text-center;
   }
-}
 
-@media (prefers-color-scheme: dark) {
-  .stamp {
-    mix-blend-mode: normal;
+  /* Campos de formulario */
+  .campo {
+    @apply w-full border border-rule bg-card px-3 py-2 text-sm text-ink placeholder:text-ink-soft/70 focus:border-accent dark:border-rule-dark dark:bg-card-dark dark:text-ink-dark dark:focus:border-accent;
+  }
+
+  .etiqueta-campo {
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-soft dark:text-ink-soft-dark;
+  }
+
+  /* Botón primario: acento, texto a la izquierda */
+  .boton-primario {
+    @apply inline-flex items-center justify-between gap-3 bg-accent px-4 py-2.5 text-left text-sm font-semibold text-paper transition-colors hover:bg-accent-700 disabled:opacity-60;
+  }
+
+  /* Botón secundario / ghost: borde de tinta */
+  .boton-ghost {
+    @apply inline-flex items-center justify-between gap-3 border-2 border-ink px-3 py-1.5 text-left text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent dark:border-ink-dark dark:text-ink-dark dark:hover:border-accent-300 dark:hover:text-accent-300;
+  }
+
+  /* Retícula con reglas de 2px: el fondo de tinta asoma por el gap */
+  .reticula {
+    @apply grid gap-0.5 border-2 border-ink bg-ink dark:border-ink-dark dark:bg-ink-dark;
+  }
+
+  .celda {
+    @apply min-w-0 bg-paper p-5 dark:bg-paper-dark sm:p-6;
+  }
+
+  /* Control segmentado */
+  .segmentado {
+    @apply inline-grid gap-0.5 border-2 border-ink bg-ink dark:border-ink-dark dark:bg-ink-dark;
+  }
+
+  .segmento {
+    @apply bg-paper px-3 py-1.5 text-left text-sm font-semibold text-ink transition-colors hover:text-accent dark:bg-paper-dark dark:text-ink-dark;
+  }
+
+  .segmento[aria-checked="true"] {
+    @apply bg-ink text-paper hover:text-paper dark:bg-ink-dark dark:text-paper-dark;
   }
 }

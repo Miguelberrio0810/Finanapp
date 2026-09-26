@@ -42,3 +42,53 @@ export function agruparPorEtiqueta(
     .map(([etiqueta, total]) => ({ etiqueta, total }))
     .sort((a, b) => b.total - a.total);
 }
+
+export interface ResumenMes {
+  clave: string; // YYYY-MM
+  etiqueta: string; // "sep"
+  ingresos: number;
+  gastos: number;
+  ahorro: number;
+  neto: number; // ingresos − gastos
+}
+
+/** Totales de los últimos `meses` meses (incluido el actual), del más antiguo al más reciente. */
+export function agruparPorMes(
+  movimientos: Movimiento[],
+  meses = 6,
+  base: Date = new Date()
+): ResumenMes[] {
+  const resultado: ResumenMes[] = [];
+  const indice = new Map<string, ResumenMes>();
+
+  for (let i = meses - 1; i >= 0; i--) {
+    const fecha = new Date(base.getFullYear(), base.getMonth() - i, 1);
+    const clave = formatearFechaISO(fecha).slice(0, 7);
+    const mes: ResumenMes = {
+      clave,
+      etiqueta: fecha.toLocaleDateString("es-CO", { month: "short" }).replace(".", ""),
+      ingresos: 0,
+      gastos: 0,
+      ahorro: 0,
+      neto: 0,
+    };
+    resultado.push(mes);
+    indice.set(clave, mes);
+  }
+
+  for (const m of movimientos) {
+    const mes = indice.get(m.fecha.slice(0, 7));
+    if (!mes) continue;
+    if (m.tipo === "ingreso") mes.ingresos += m.monto;
+    else if (m.tipo === "gasto") mes.gastos += m.monto;
+    else if (m.tipo === "ahorro") mes.ahorro += m.monto;
+  }
+
+  for (const mes of resultado) mes.neto = mes.ingresos - mes.gastos;
+  return resultado;
+}
+
+export function diasRestantesDelMes(base: Date = new Date()): number {
+  const ultimoDia = new Date(base.getFullYear(), base.getMonth() + 1, 0).getDate();
+  return ultimoDia - base.getDate();
+}

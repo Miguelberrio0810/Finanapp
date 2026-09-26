@@ -1,22 +1,12 @@
 import type { Metadata } from "next";
-import { Bitter, IBM_Plex_Mono, Work_Sans } from "next/font/google";
+import { Archivo } from "next/font/google";
+import { PrivacidadProvider } from "@/components/layout/PrivacidadProvider";
 import "./globals.css";
 
-const bitter = Bitter({
+const archivo = Archivo({
   subsets: ["latin"],
+  weight: ["400", "600", "800"],
   variable: "--font-display",
-  weight: ["600", "700", "800"],
-});
-
-const workSans = Work_Sans({
-  subsets: ["latin"],
-  variable: "--font-body",
-});
-
-const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -31,10 +21,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body
-        className={`${bitter.variable} ${workSans.variable} ${plexMono.variable} font-sans`}
-      >
-        {children}
+      <body className={`${archivo.variable} font-sans`}>
+        <PrivacidadProvider>{children}</PrivacidadProvider>
       </body>
     </html>
   );

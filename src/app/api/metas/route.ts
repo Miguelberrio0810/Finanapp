@@ -18,9 +18,10 @@ export async function POST(req: NextRequest) {
     typeof body?.montoObjetivo === "number" && body.montoObjetivo > 0
       ? body.montoObjetivo
       : 1000000;
+  const fase = body?.fase === 2 ? 2 : 1;
 
   const meta = await prisma.metaAhorro.create({
-    data: { nombreMeta, montoObjetivo, montoActual: 0, monto15: 0, monto30: 0 },
+    data: { nombreMeta, montoObjetivo, montoActual: 0, monto15: 0, monto30: 0, fase },
   });
 
   return NextResponse.json(mapMetaAhorro(meta), { status: 201 });

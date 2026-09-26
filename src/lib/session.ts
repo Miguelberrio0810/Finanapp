@@ -32,3 +32,12 @@ export const COOKIE_SESION = {
   nombre: NOMBRE_COOKIE,
   maxAge: DURACION_SEGUNDOS,
 };
+
+export async function leerEmailSesion(token: string): Promise<string | null> {
+  try {
+    const { payload } = await jwtVerify(token, obtenerClave());
+    return typeof payload.email === "string" ? payload.email : null;
+  } catch {
+    return null;
+  }
+}

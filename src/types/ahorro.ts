@@ -9,6 +9,7 @@ export interface MetaAhorro {
   montoObjetivo: number;
   montoActual: number;
   planQuincenal: PlanQuincenal;
+  fase?: number;
 }
 
 export interface DiagnosticoIA {

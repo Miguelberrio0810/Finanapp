@@ -24,6 +24,10 @@ export async function PATCH(
     data.monto30 = body.planQuincenal.monto30;
   }
 
+  if (body?.fase === 1 || body?.fase === 2) {
+    data.fase = body.fase;
+  }
+
   if (Object.keys(data).length === 0) {
     return NextResponse.json({ error: "Nada que actualizar" }, { status: 400 });
   }
