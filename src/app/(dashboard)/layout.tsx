@@ -1,4 +1,5 @@
 import NavBar from "@/components/layout/NavBar";
+import { MovimientoModalProvider } from "@/components/finanzas/MovimientoModal";
 
 export default function DashboardLayout({
   children,
@@ -6,9 +7,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen">
-      <NavBar />
-      {children}
-    </div>
+    <MovimientoModalProvider>
+      <div className="min-h-screen">
+        <NavBar />
+        {children}
+      </div>
+    </MovimientoModalProvider>
   );
 }

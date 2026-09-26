@@ -6,6 +6,19 @@ import { avisarCambio, useAlCambiar } from "@/lib/eventos";
 
 export type NuevoMovimiento = Omit<Movimiento, "id">;
 
+/** Crea un movimiento y avisa a los demás hooks. Devuelve null si el servidor lo rechaza. */
+export async function crearMovimiento(nuevo: NuevoMovimiento): Promise<Movimiento | null> {
+  const res = await fetch("/api/movimientos", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(nuevo),
+  });
+  if (!res.ok) return null;
+  const creado: Movimiento = await res.json();
+  avisarCambio();
+  return creado;
+}
+
 /** Sin `tipo` trae todos los movimientos (ingresos, gastos y abonos). */
 export function useMovimientos(tipo?: TipoMovimiento) {
   const clave = tipo ?? "todos";
@@ -39,19 +52,13 @@ export function useMovimientos(tipo?: TipoMovimiento) {
 
   const agregar = useCallback(
     async (nuevo: NuevoMovimiento): Promise<boolean> => {
-      const res = await fetch("/api/movimientos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...nuevo, tipo: nuevo.tipo ?? tipo }),
-      });
-      if (!res.ok) return false;
-      const creado: Movimiento = await res.json();
+      const creado = await crearMovimiento({ ...nuevo, tipo: nuevo.tipo ?? tipo });
+      if (!creado) return false;
       setEstado((prev) =>
         prev && (!tipo || creado.tipo === tipo)
           ? { ...prev, movimientos: [creado, ...prev.movimientos] }
           : prev
       );
-      avisarCambio();
       return true;
     },
     [tipo]

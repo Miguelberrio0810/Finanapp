@@ -76,8 +76,25 @@
     @apply inline-flex items-center justify-between gap-3 border-2 border-ink px-3 py-1.5 text-left text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent dark:border-ink-dark dark:text-ink-dark dark:hover:border-accent-300 dark:hover:text-accent-300;
   }
 
-  /* Regla de 2px entre secciones */
-  .regla {
-    @apply border-ink dark:border-ink-dark;
+  /* Retícula con reglas de 2px: el fondo de tinta asoma por el gap */
+  .reticula {
+    @apply grid gap-0.5 border-2 border-ink bg-ink dark:border-ink-dark dark:bg-ink-dark;
+  }
+
+  .celda {
+    @apply min-w-0 bg-paper p-5 dark:bg-paper-dark sm:p-6;
+  }
+
+  /* Control segmentado */
+  .segmentado {
+    @apply inline-grid gap-0.5 border-2 border-ink bg-ink dark:border-ink-dark dark:bg-ink-dark;
+  }
+
+  .segmento {
+    @apply bg-paper px-3 py-1.5 text-left text-sm font-semibold text-ink transition-colors hover:text-accent dark:bg-paper-dark dark:text-ink-dark;
+  }
+
+  .segmento[aria-checked="true"] {
+    @apply bg-ink text-paper hover:text-paper dark:bg-ink-dark dark:text-paper-dark;
   }
 }
