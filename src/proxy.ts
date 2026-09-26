@@ -28,6 +28,7 @@ export async function proxy(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    // Los iconos de la app deben verse también sin sesión (p. ej. en /login)
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon).*)",
   ],
 };
