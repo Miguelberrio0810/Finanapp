@@ -1,9 +1,9 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { createContext, useCallback, useContext, useState } from "react";
 import { ETIQUETAS_GASTO, ETIQUETAS_INGRESO, TipoMovimiento } from "@/types/finanzas";
 import MovimientoForm from "@/components/finanzas/MovimientoForm";
+import Dialogo from "@/components/layout/Dialogo";
 import { crearMovimiento } from "@/hooks/useMovimientos";
 import { useCategorias } from "@/hooks/useCategorias";
 import { useMetas } from "@/hooks/useMetas";
@@ -50,85 +50,44 @@ function MovimientoModal({
   const ingresos = useCategorias("ingreso", ETIQUETAS_INGRESO);
   const { metas } = useMetas();
 
-  useEffect(() => {
-    const alPresionar = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCerrar();
-    };
-    window.addEventListener("keydown", alPresionar);
-    const overflowPrevio = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", alPresionar);
-      document.body.style.overflow = overflowPrevio;
-    };
-  }, [onCerrar]);
-
   const categorias = tipo === "gasto" ? gastos : ingresos;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/60 px-4 py-10 sm:items-center"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onCerrar();
-      }}
-    >
+    <Dialogo titulo="Nuevo movimiento" onCerrar={onCerrar}>
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="titulo-nuevo-movimiento"
-        className="w-full max-w-lg border-2 border-ink bg-paper dark:border-ink-dark dark:bg-paper-dark"
+        role="radiogroup"
+        aria-label="Tipo de movimiento"
+        className="segmentado mb-6 grid w-full grid-cols-3"
       >
-        <div className="flex items-center justify-between border-b-2 border-ink px-6 py-4 dark:border-ink-dark">
-          <h2 id="titulo-nuevo-movimiento" className="text-xl text-ink dark:text-ink-dark">
-            Nuevo movimiento
-          </h2>
+        {TIPOS.map(({ valor, label }) => (
           <button
+            key={valor}
             type="button"
-            onClick={onCerrar}
-            aria-label="Cerrar"
-            className="p-1 text-ink hover:text-accent dark:text-ink-dark"
+            role="radio"
+            aria-checked={tipo === valor}
+            onClick={() => setTipo(valor)}
+            className="segmento py-2"
           >
-            <X className="h-5 w-5" />
+            {label}
           </button>
-        </div>
-
-        <div className="p-6">
-          <div
-            role="radiogroup"
-            aria-label="Tipo de movimiento"
-            className="segmentado mb-6 grid w-full grid-cols-3"
-          >
-            {TIPOS.map(({ valor, label }) => (
-              <button
-                key={valor}
-                type="button"
-                role="radio"
-                aria-checked={tipo === valor}
-                onClick={() => setTipo(valor)}
-                className="segmento py-2"
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <MovimientoForm
-            key={tipo}
-            tipo={tipo}
-            variante="select"
-            embebido
-            categorias={categorias.categorias}
-            metas={metas.map((m) => ({ id: m.id, nombre: m.nombreMeta }))}
-            metaInicial={inicial.metaId}
-            onAgregar={async (nuevo) => {
-              const creado = await crearMovimiento(nuevo);
-              if (!creado) return false;
-              onCerrar();
-              return true;
-            }}
-          />
-        </div>
+        ))}
       </div>
-    </div>
+
+      <MovimientoForm
+        key={tipo}
+        tipo={tipo}
+        variante="select"
+        embebido
+        categorias={categorias.categorias}
+        metas={metas.map((m) => ({ id: m.id, nombre: m.nombreMeta }))}
+        metaInicial={inicial.metaId}
+        onAgregar={async (nuevo) => {
+          const creado = await crearMovimiento(nuevo);
+          if (!creado) return false;
+          onCerrar();
+          return true;
+        }}
+      />
+    </Dialogo>
   );
 }
