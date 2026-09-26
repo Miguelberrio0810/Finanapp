@@ -1,47 +1,68 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Movimiento } from "@/types/finanzas";
+import { Movimiento, TipoMovimiento } from "@/types/finanzas";
+import { avisarCambio, useAlCambiar } from "@/lib/eventos";
 
-export function useMovimientos(tipo: "ingreso" | "gasto") {
-  const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
-  const [cargando, setCargando] = useState(true);
+export type NuevoMovimiento = Omit<Movimiento, "id">;
+
+/** Sin `tipo` trae todos los movimientos (ingresos, gastos y abonos). */
+export function useMovimientos(tipo?: TipoMovimiento) {
+  const clave = tipo ?? "todos";
+  const [estado, setEstado] = useState<{ clave: string; movimientos: Movimiento[] } | null>(
+    null
+  );
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     let cancelado = false;
-    setCargando(true);
+    const url = tipo ? `/api/movimientos?tipo=${tipo}` : "/api/movimientos";
 
-    fetch(`/api/movimientos?tipo=${tipo}`)
-      .then((res) => res.json())
+    fetch(url)
+      .then((res) => (res.ok ? res.json() : []))
       .then((data: Movimiento[]) => {
-        if (!cancelado) setMovimientos(data);
+        if (!cancelado) setEstado({ clave, movimientos: data });
       })
-      .finally(() => {
-        if (!cancelado) setCargando(false);
+      .catch(() => {
+        if (!cancelado) setEstado({ clave, movimientos: [] });
       });
 
     return () => {
       cancelado = true;
     };
-  }, [tipo]);
+  }, [tipo, clave, version]);
+
+  useAlCambiar(() => setVersion((v) => v + 1));
+
+  const cargando = estado?.clave !== clave;
+  const movimientos = estado?.clave === clave ? estado.movimientos : [];
 
   const agregar = useCallback(
-    async (nuevo: Omit<Movimiento, "id">) => {
+    async (nuevo: NuevoMovimiento): Promise<boolean> => {
       const res = await fetch("/api/movimientos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...nuevo, tipo }),
+        body: JSON.stringify({ ...nuevo, tipo: nuevo.tipo ?? tipo }),
       });
-      if (!res.ok) return;
+      if (!res.ok) return false;
       const creado: Movimiento = await res.json();
-      setMovimientos((prev) => [creado, ...prev]);
+      setEstado((prev) =>
+        prev && (!tipo || creado.tipo === tipo)
+          ? { ...prev, movimientos: [creado, ...prev.movimientos] }
+          : prev
+      );
+      avisarCambio();
+      return true;
     },
     [tipo]
   );
 
   const eliminar = useCallback(async (id: string) => {
-    setMovimientos((prev) => prev.filter((m) => m.id !== id));
+    setEstado((prev) =>
+      prev ? { ...prev, movimientos: prev.movimientos.filter((m) => m.id !== id) } : prev
+    );
     await fetch(`/api/movimientos/${id}`, { method: "DELETE" });
+    avisarCambio();
   }, []);
 
   return { movimientos, cargando, agregar, eliminar };
