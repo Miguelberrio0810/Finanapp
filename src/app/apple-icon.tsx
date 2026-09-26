@@ -18,9 +18,9 @@ export default function AppleIcon() {
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", position: "relative", background: "#ec3013", display: "flex" }}>
-        <div style={barra(8, 7, 5, 18)} />
-        <div style={barra(8, 7, 16, 5)} />
-        <div style={barra(8, 14.5, 12, 4)} />
+        <div style={barra(8, 6, 6, 20)} />
+        <div style={barra(8, 6, 16, 6)} />
+        <div style={barra(8, 14, 12, 4)} />
       </div>
     ),
     size
